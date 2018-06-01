@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"text/template"
+
 	"github.com/marthjod/bingo/model/case"
 	"github.com/marthjod/bingo/model/gender"
 	"github.com/marthjod/bingo/model/number"
 	"gopkg.in/xmlpath.v2"
-	"text/template"
 )
 
 // CaseForm represents a single case form, i.e. case name, number, and actual form.
@@ -22,6 +23,15 @@ type CaseForm struct {
 type Noun struct {
 	Gender    gender.Gender `json:"gender"`
 	CaseForms []CaseForm    `json:"cases"`
+}
+
+func FromJSON(b []byte) (Noun, error) {
+	var n Noun
+	err := json.Unmarshal(b, &n)
+	if err != nil {
+		return Noun{}, fmt.Errorf("%s %s", b, err)
+	}
+	return n, nil
 }
 
 // ParseNoun parses XML input into a Noun struct.
@@ -89,7 +99,7 @@ func ParseNoun(header string, iter *xmlpath.Iter) *Noun {
 }
 
 // JSON representation of a Noun.
-func (n *Noun) JSON() string {
+func (n Noun) JSON() string {
 	j, err := json.MarshalIndent(n, "", "  ")
 	if err != nil {
 		return fmt.Sprintf(`{"error": "%s"}`, err.Error())
@@ -98,7 +108,7 @@ func (n *Noun) JSON() string {
 }
 
 // List of a Noun's forms.
-func (n *Noun) List() []string {
+func (n Noun) List() []string {
 	l := []string{}
 	for _, c := range n.CaseForms {
 		l = append(l, c.Form)
@@ -108,7 +118,7 @@ func (n *Noun) List() []string {
 }
 
 // ParseTemplate returns a parsed template based on Noun fields.
-func (n *Noun) ParseTemplate(tpl string) ([]byte, error) {
+func (n Noun) ParseTemplate(tpl string) ([]byte, error) {
 	var buf bytes.Buffer
 
 	tmpl, err := template.New("").Parse(tpl)

@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -10,6 +10,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/marthjod/binquiry-new/pkg/getter"
+	"github.com/marthjod/binquiry-new/pkg/model/noun"
+	"github.com/marthjod/binquiry-new/pkg/model/wordtype"
 	"github.com/marthjod/binquiry-new/pkg/reader"
 )
 
@@ -35,10 +37,10 @@ func main() {
 	// 	log.Fatalln("GETTER not set")
 	// }
 
-	// nounParser := os.Getenv("NOUN_PARSER")
-	// if len(nounParser) == 0 {
-	// 	log.Fatalln("NOUN_PARSER not set")
-	// }
+	nounParser := os.Getenv("NOUNPARSER")
+	if len(nounParser) == 0 {
+		log.Fatalln("NOUNPARSER not set")
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		query := strings.TrimLeft(r.URL.Path, "/")
@@ -58,16 +60,43 @@ func main() {
 			return
 		}
 
+		var words = wordtype.Words{}
+
 		for _, resp := range res {
-			header, wordType, _, err := reader.Read(bytes.NewReader(resp))
+			_, wordType, _, err := reader.Read(bytes.NewReader(resp))
 			if err != nil {
 				w.WriteHeader(http.StatusBadGateway)
 				return
 			}
-			fmt.Fprintf(w, "header: %q, word type: %q\n", header, wordType)
+
+			switch wordType {
+			case wordtype.Noun:
+				req, err := http.NewRequest(http.MethodGet, nounParser, bytes.NewReader(resp))
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				c := &http.Client{}
+				resp, err := c.Do(req)
+				if err != nil {
+					log.Error(err)
+				}
+
+				b, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					log.Error(err)
+				}
+				defer resp.Body.Close()
+				w, err := noun.FromJSON(b)
+				if err != nil {
+					log.Error(err)
+				}
+				words = append(words, w)
+			}
+
 		}
 
-		// TODO determine word type and pass on to right parser
+		log.Infof("%s", words.JSON())
 
 	})
 	log.Infof("listening on :%s", port)

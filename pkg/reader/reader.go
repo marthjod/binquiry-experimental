@@ -3,11 +3,12 @@ package reader
 import (
 	"bytes"
 	"errors"
-	"github.com/marthjod/binquiry/model/wordtype"
-	"gopkg.in/xmlpath.v2"
 	"html"
 	"io"
 	"io/ioutil"
+
+	"github.com/marthjod/binquiry-new/pkg/model/wordtype"
+	"gopkg.in/xmlpath.v2"
 )
 
 // GetHeader returns the raw header string from an XML snippet, if found.
