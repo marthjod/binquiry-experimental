@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -60,65 +61,75 @@ func main() {
 		}
 
 		var words = wordtype.Words{}
+		wordChan := make(chan wordtype.Word, len(res))
+		errChan := make(chan error, len(res))
 
 		for _, resp := range res {
-			_, wordType, _, err := reader.Read(bytes.NewReader(resp))
-			if err != nil {
-				w.WriteHeader(http.StatusBadGateway)
-				return
-			}
-
-			switch wordType {
-			case wordtype.Noun:
-				// Set up a connection to the server.
-				conn, err := grpc.Dial(nounParser, grpc.WithInsecure())
+			go func(r []byte) {
+				w, err := dispatch(r, nounParser)
 				if err != nil {
-					log.Fatalf("did not connect: %v", err)
+					errChan <- err
+					return
 				}
-				defer conn.Close()
-				c := pb.NewNounParserClient(conn)
-
-				// Contact the server and print out its response.
-				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-				defer cancel()
-				r, err := c.Parse(ctx, &pb.ParseRequest{Word: resp})
-				if err != nil {
-					log.Fatalln(err)
-				}
-				log.Debugf("Response: %s", r.Json)
-				w, err := noun.FromJSON(r.Json)
-				if err != nil {
-					log.Fatalln(err)
-				}
-
-				// req, err := http.NewRequest(http.MethodGet, nounParser, bytes.NewReader(resp))
-				// if err != nil {
-				// 	w.WriteHeader(http.StatusInternalServerError)
-				// 	return
-				// }
-				// c := &http.Client{}
-				// resp, err := c.Do(req)
-				// if err != nil {
-				// 	log.Error(err)
-				// }
-
-				// b, err := ioutil.ReadAll(resp.Body)
-				// if err != nil {
-				// 	log.Error(err)
-				// }
-				// defer resp.Body.Close()
-				// w, err := noun.FromJSON(b)
-				// if err != nil {
-				// 	log.Error(err)
-				// }
-				words = append(words, w)
-			}
-
+				log.Debugf("sending to word chan: %s", w)
+				wordChan <- w
+			}(resp)
 		}
 
+		log.Debugf("will select %d time(s)", len(res))
+		for i := 0; i < len(res); i++ {
+			select {
+			case word := <-wordChan:
+				log.Debugf("word chan received %s", word)
+				words = append(words, word)
+			case err := <-errChan:
+				log.Debug("got error on error chan")
+				log.Error(err)
+			}
+		}
 		fmt.Fprintf(w, "%s\n", words.JSON())
 
 	})
 	log.Infof("listening on :%s", port)
 	log.Fatalln(http.ListenAndServe(":"+port, nil))
+}
+
+func dispatch(in []byte, nounParser string) (wordtype.Word, error) {
+	_, wordType, _, err := reader.Read(bytes.NewReader(in))
+	if err != nil {
+		return nil, err
+	}
+
+	switch wordType {
+	case wordtype.Noun:
+		return parseNoun(in, nounParser)
+	default:
+		return nil, errors.New("not implemented yet")
+	}
+}
+
+func parseNoun(in []byte, parser string) (wordtype.Word, error) {
+
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(parser, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	c := pb.NewNounParserClient(conn)
+
+	// Contact the server and print out its response.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.Parse(ctx, &pb.ParseRequest{Word: in})
+	if err != nil {
+		return nil, err
+	}
+	// log.Debugf("Response: %s", r.Json)
+	w, err := noun.FromJSON(r.Json)
+	if err != nil {
+		return nil, err
+	}
+
+	return w, nil
 }
