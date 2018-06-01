@@ -13,13 +13,14 @@ import (
 	"sync"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/marthjod/binquiry-new/reader"
+	"github.com/marthjod/binquiry-new/pkg/reader"
 	"golang.org/x/net/html"
 	"gopkg.in/xmlpath.v2"
 )
 
 // Getter builds query URLs and HTTP requests against a data source.
 type Getter struct {
+	Client         *http.Client
 	URLPrefix      string
 	responseBodies [][]byte
 }
@@ -40,15 +41,25 @@ func (g *Getter) IDQuery(id int) (query string) {
 func (g *Getter) GetWord(word string) (responses [][]byte, err error) {
 	query := g.WordQuery(word)
 	log.Debug("query: ", query)
-	r, err := http.Get(query)
+
+	req, err := http.NewRequest(http.MethodGet, query, nil)
 	if err != nil {
-		return
+		log.Error(err)
+		return [][]byte{}, err
 	}
 
-	b, err := ioutil.ReadAll(r.Body)
+	resp, err := g.Client.Do(req)
 	if err != nil {
-		return
+		log.Error(err)
+		return [][]byte{}, err
 	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+		return [][]byte{}, err
+	}
+	defer resp.Body.Close()
 
 	return g.dispatch(reader.Sanitize(b))
 }
@@ -57,7 +68,12 @@ func (g *Getter) GetWord(word string) (responses [][]byte, err error) {
 func (g *Getter) GetID(id int) (*http.Response, error) {
 	query := g.IDQuery(id)
 	log.Debug("query: ", query)
-	return http.Get(query)
+	req, err := http.NewRequest(http.MethodGet, query, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return g.Client.Do(req)
 }
 
 func (g *Getter) fetchLink(link string, w *sync.WaitGroup) {

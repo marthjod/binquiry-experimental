@@ -1,31 +1,28 @@
 package main
 
 import (
-	"io/ioutil"
+	"fmt"
+	"log"
 	"net/http"
 	"os"
 
-	"github.com/marthjod/binquiy-new/pkg/reader"
+	"github.com/marthjod/binquiry-new/pkg/reader"
 )
 
 func main() {
 	port := os.Getenv("PORT")
 
 	http.HandleFunc("/parse", nounHandler)
-	http.ListenAndServe(":"+port, nil)
+	log.Printf("listening on :%s\n", port)
+	log.Fatalln(http.ListenAndServe(":"+port, nil))
 }
 
 func nounHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-	}
-
-	header, wordType, xmlRoot, err := reader.Read(r.Body)
+	log.Println("incoming request")
+	header, wordType, _, err := reader.Read(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
+	fmt.Fprintf(w, "header: %q, word type: %q\n", header, wordType)
 }

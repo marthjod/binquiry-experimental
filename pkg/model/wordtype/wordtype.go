@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"strings"
 )
 
@@ -52,11 +51,13 @@ func GetWordType(header string) WordType {
 
 func Determine(r io.Reader) WordType {
 	s := bufio.NewScanner(r)
-	s, err := ioutil.ReadAll(r)
-	if err != nil {
-		return Unknown
+	for s.Scan() {
+		t := GetWordType(s.Text())
+		if t != Unknown {
+			return t
+		}
 	}
-	return GetWordType(s)
+	return Unknown
 
 }
 
