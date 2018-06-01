@@ -2,7 +2,8 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
+	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -11,8 +12,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/marthjod/binquiry-new/pkg/getter"
 	"github.com/marthjod/binquiry-new/pkg/model/noun"
+	pb "github.com/marthjod/binquiry-new/pkg/model/noun"
 	"github.com/marthjod/binquiry-new/pkg/model/wordtype"
 	"github.com/marthjod/binquiry-new/pkg/reader"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -32,10 +35,6 @@ func main() {
 	}
 
 	log.SetLevel(lvl)
-	// getterURL := os.Getenv("GETTER")
-	// if len(getterURL) == 0 {
-	// 	log.Fatalln("GETTER not set")
-	// }
 
 	nounParser := os.Getenv("NOUNPARSER")
 	if len(nounParser) == 0 {
@@ -71,32 +70,53 @@ func main() {
 
 			switch wordType {
 			case wordtype.Noun:
-				req, err := http.NewRequest(http.MethodGet, nounParser, bytes.NewReader(resp))
+				// Set up a connection to the server.
+				conn, err := grpc.Dial(nounParser, grpc.WithInsecure())
 				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
+					log.Fatalf("did not connect: %v", err)
 				}
-				c := &http.Client{}
-				resp, err := c.Do(req)
+				defer conn.Close()
+				c := pb.NewNounParserClient(conn)
+
+				// Contact the server and print out its response.
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				defer cancel()
+				r, err := c.Parse(ctx, &pb.ParseRequest{Word: resp})
 				if err != nil {
-					log.Error(err)
+					log.Fatalln(err)
+				}
+				log.Debugf("Response: %s", r.Json)
+				w, err := noun.FromJSON(r.Json)
+				if err != nil {
+					log.Fatalln(err)
 				}
 
-				b, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					log.Error(err)
-				}
-				defer resp.Body.Close()
-				w, err := noun.FromJSON(b)
-				if err != nil {
-					log.Error(err)
-				}
+				// req, err := http.NewRequest(http.MethodGet, nounParser, bytes.NewReader(resp))
+				// if err != nil {
+				// 	w.WriteHeader(http.StatusInternalServerError)
+				// 	return
+				// }
+				// c := &http.Client{}
+				// resp, err := c.Do(req)
+				// if err != nil {
+				// 	log.Error(err)
+				// }
+
+				// b, err := ioutil.ReadAll(resp.Body)
+				// if err != nil {
+				// 	log.Error(err)
+				// }
+				// defer resp.Body.Close()
+				// w, err := noun.FromJSON(b)
+				// if err != nil {
+				// 	log.Error(err)
+				// }
 				words = append(words, w)
 			}
 
 		}
 
-		log.Infof("%s", words.JSON())
+		fmt.Fprintf(w, "%s\n", words.JSON())
 
 	})
 	log.Infof("listening on :%s", port)
