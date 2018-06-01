@@ -1,0 +1,10 @@
+mode: set
+github.com/marthjod/bingo/reader/reader.go:14.64,17.2 2 1
+github.com/marthjod/bingo/reader/reader.go:20.102,22.16 2 1
+github.com/marthjod/bingo/reader/reader.go:26.2,27.16 2 1
+github.com/marthjod/bingo/reader/reader.go:31.2,32.9 2 1
+github.com/marthjod/bingo/reader/reader.go:36.2,38.36 2 1
+github.com/marthjod/bingo/reader/reader.go:22.16,24.3 1 0
+github.com/marthjod/bingo/reader/reader.go:27.16,29.3 1 1
+github.com/marthjod/bingo/reader/reader.go:32.9,34.3 1 1
+github.com/marthjod/bingo/reader/reader.go:42.34,44.2 1 1

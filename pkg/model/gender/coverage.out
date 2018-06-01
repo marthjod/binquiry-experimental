@@ -1,0 +1,20 @@
+mode: set
+github.com/marthjod/bingo/model/gender/gender.go:26.38,27.28 1 1
+github.com/marthjod/bingo/model/gender/gender.go:33.2,33.16 1 1
+github.com/marthjod/bingo/model/gender/gender.go:27.28,28.51 1 1
+github.com/marthjod/bingo/model/gender/gender.go:28.51,30.4 1 1
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:26.13,28.48 2 1
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:28.48,35.3 1 1
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:39.47,40.48 1 0
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:43.2,44.9 2 0
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:47.2,47.24 1 0
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:40.48,42.3 1 0
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:44.9,46.3 1 0
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:51.51,53.49 2 0
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:56.2,57.9 2 0
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:60.2,61.12 2 0
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:53.49,55.3 1 0
+github.com/marthjod/bingo/model/gender/gender_jsonenums.go:57.9,59.3 1 0
+github.com/marthjod/bingo/model/gender/gender_string.go:11.33,12.48 1 1
+github.com/marthjod/bingo/model/gender/gender_string.go:15.2,15.58 1 1
+github.com/marthjod/bingo/model/gender/gender_string.go:12.48,14.3 1 0
