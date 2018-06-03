@@ -1,20 +1,15 @@
 package wordtype
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"html/template"
-	"io"
 	"strings"
 )
 
 // Word represents features every word type must exhibit.
 type Word interface {
 	JSON() string
-	List() []string
-	ParseTemplate(tpl string) ([]byte, error)
+	CanonicalForm() string
 }
 
 // Words is a list of Word types.
@@ -49,18 +44,6 @@ func GetWordType(header string) WordType {
 	return Unknown
 }
 
-func Determine(r io.Reader) WordType {
-	s := bufio.NewScanner(r)
-	for s.Scan() {
-		t := GetWordType(s.Text())
-		if t != Unknown {
-			return t
-		}
-	}
-	return Unknown
-
-}
-
 // JSON representation of Words.
 func (w *Words) JSON() string {
 	j, err := json.MarshalIndent(w, "", "  ")
@@ -68,28 +51,4 @@ func (w *Words) JSON() string {
 		return fmt.Sprintf(`{"error": "%s"}`, err.Error())
 	}
 	return string(j)
-}
-
-// List representation of Words.
-func (w *Words) List() string {
-	var buffer bytes.Buffer
-
-	for _, word := range *w {
-		buffer.WriteString(fmt.Sprintf("%s\n", word.List()))
-	}
-
-	return buffer.String()
-}
-
-// ParseTemplate returns a parsed template based on Words' fields.
-func (w *Words) ParseTemplate(tpl string) ([]byte, error) {
-	var buf bytes.Buffer
-
-	tmpl, err := template.New("").Parse(tpl)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	err = tmpl.Execute(&buf, w)
-	return buf.Bytes(), err
 }

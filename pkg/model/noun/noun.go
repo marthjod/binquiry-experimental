@@ -1,10 +1,8 @@
 package noun
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"text/template"
 
 	"github.com/marthjod/bingo/model/case"
 	"github.com/marthjod/bingo/model/gender"
@@ -107,25 +105,17 @@ func (n Noun) JSON() string {
 	return string(j)
 }
 
-// List of a Noun's forms.
-func (n Noun) List() []string {
-	l := []string{}
-	for _, c := range n.CaseForms {
-		l = append(l, c.Form)
+// CanonicalForm returns a noun's canonical form, ie. nominative singular.
+func (n Noun) CanonicalForm() string {
+	for _, f := range n.CaseForms {
+		if f.Case == cases.Nominative && f.Number == number.Singular {
+			return f.Form
+		}
 	}
-
-	return l
+	// TODO this should not be reached
+	return ""
 }
 
-// ParseTemplate returns a parsed template based on Noun fields.
-func (n Noun) ParseTemplate(tpl string) ([]byte, error) {
-	var buf bytes.Buffer
-
-	tmpl, err := template.New("").Parse(tpl)
-	if err != nil {
-		return []byte{}, err
-	}
-
-	err = tmpl.Execute(&buf, n)
-	return buf.Bytes(), err
+func (n Noun) String() string {
+	return n.CanonicalForm()
 }
