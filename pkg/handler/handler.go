@@ -39,23 +39,17 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		"task": "handler",
 	})
 	h.logger.Debug("starting")
-	h.serveHTTP(w, r)
-	end := time.Now()
-	h.logger.WithField("duration", end.Sub(start)).Debug("done")
-}
 
-func (h *handler) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	query := strings.TrimLeft(r.URL.Path, "/")
-	h.logger.Debugf("request: %q", query)
+	h.logger.WithFields(log.Fields{
+		"request": query,
+	}).Debug()
 	if len(query) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	g := getter.Getter{
-		URLPrefix: "http://dev.phpbin.ja.is/ajax_leit.php",
-		Client:    &http.Client{Timeout: 5 * time.Second},
-	}
+	g := getter.NewGetter("http://dev.phpbin.ja.is/ajax_leit.php", &http.Client{Timeout: 5 * time.Second}, cid)
 	res, err := g.GetWord(query)
 	if err != nil {
 		w.WriteHeader(http.StatusBadGateway)
@@ -94,12 +88,16 @@ func (h *handler) serveHTTP(w http.ResponseWriter, r *http.Request) {
 				}).Error()
 				break
 			}
-			h.logger.Debugf("found: %q", result.word)
+			h.logger.WithFields(log.Fields{
+				"result": result.word,
+			}).Debug()
 			words = append(words, result.word)
 		}
 	}
 
 	fmt.Fprintf(w, "%s\n", words.JSON())
+	end := time.Now()
+	h.logger.WithField("duration", end.Sub(start)).Debug("done")
 }
 
 func dispatch(in []byte, parsers map[wordtype.WordType]string) (wordtype.Word, error) {
