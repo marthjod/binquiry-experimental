@@ -7,8 +7,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/marthjod/binquiry-new/pkg/model/noun"
-	"github.com/marthjod/binquiry-new/pkg/reader"
+	"github.com/marthjod/binquiry-experimental/pkg/model/noun"
+	"github.com/marthjod/binquiry-experimental/pkg/reader"
 	xmlpath "gopkg.in/xmlpath.v2"
 )
 

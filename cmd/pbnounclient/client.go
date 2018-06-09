@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	pb "github.com/marthjod/binquiry-new/pkg/model/noun"
+	pb "github.com/marthjod/binquiry-experimental/pkg/model/noun"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )

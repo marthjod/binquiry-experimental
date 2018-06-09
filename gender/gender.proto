@@ -1,0 +1,10 @@
+syntax = "proto3";
+package gender;
+option go_package = "github.com/marthjod/binquiry-experimental/gender";
+
+enum Gender {
+    Masculine = 0;
+	Feminine  = 1;
+	Neuter    = 2;
+	Unknown   = 3;
+}

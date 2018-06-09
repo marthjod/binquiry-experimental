@@ -1,0 +1,30 @@
+syntax = "proto3";
+package noun;
+option go_package = "github.com/marthjod/binquiry-experimental/noun";
+
+import "gender/gender.proto";
+import "case/case.proto";
+import "number/number.proto";
+
+message CaseForm {
+    string form = 1;
+    number.Number number = 2;
+    case.Case case = 3;                
+}
+
+message Noun {
+    gender.Gender gender = 1;
+    repeated CaseForm cases = 2;
+}
+
+message ParseRequest {
+    bytes word = 1;
+}
+
+message ParseResponse {
+    Noun noun = 1;
+}
+
+service NounParser {
+    rpc Parse (ParseRequest) returns (ParseResponse) {}
+}

@@ -10,11 +10,11 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/marthjod/binquiry-new/pkg/getter"
-	"github.com/marthjod/binquiry-new/pkg/model/noun"
-	pb "github.com/marthjod/binquiry-new/pkg/model/noun"
-	"github.com/marthjod/binquiry-new/pkg/model/wordtype"
-	"github.com/marthjod/binquiry-new/pkg/reader"
+	"github.com/marthjod/binquiry-experimental/pkg/getter"
+	"github.com/marthjod/binquiry-experimental/pkg/model/noun"
+	pb "github.com/marthjod/binquiry-experimental/pkg/model/noun"
+	"github.com/marthjod/binquiry-experimental/pkg/model/wordtype"
+	"github.com/marthjod/binquiry-experimental/pkg/reader"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc"
 )

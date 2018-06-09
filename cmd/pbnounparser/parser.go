@@ -6,9 +6,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/marthjod/binquiry-new/pkg/model/noun"
-	pb "github.com/marthjod/binquiry-new/pkg/model/noun"
-	"github.com/marthjod/binquiry-new/pkg/reader"
+	"github.com/marthjod/binquiry-experimental/noun"
+	pb "github.com/marthjod/binquiry-experimental/noun"
+	"github.com/marthjod/binquiry-experimental/pkg/reader"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	xmlpath "gopkg.in/xmlpath.v2"
@@ -27,7 +27,7 @@ func (s *server) Parse(ctx context.Context, in *pb.ParseRequest) (*pb.ParseRespo
 	}
 	path := xmlpath.MustCompile("//tr/td[2]")
 	word := noun.ParseNoun(header, path.Iter(xmlRoot))
-	return &pb.ParseResponse{Json: []byte(word.JSON())}, nil
+	return &pb.ParseResponse{Noun: word}, nil
 }
 
 func main() {

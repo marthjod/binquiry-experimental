@@ -12,7 +12,7 @@ import (
 	"strconv"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/marthjod/binquiry-new/pkg/reader"
+	"github.com/marthjod/binquiry-experimental/pkg/reader"
 	"golang.org/x/net/html"
 	"gopkg.in/xmlpath.v2"
 )

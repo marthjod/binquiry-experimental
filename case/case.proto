@@ -1,0 +1,10 @@
+syntax = "proto3";
+package case;
+option go_package = "github.com/marthjod/binquiry-experimental/case";
+
+enum Case {
+	Nominative = 0;
+	Accusative = 1;
+	Dative     = 2;
+	Genitive   = 3;
+}

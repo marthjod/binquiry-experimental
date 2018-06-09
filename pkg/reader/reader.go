@@ -7,8 +7,8 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/marthjod/binquiry-new/pkg/model/wordtype"
-	"gopkg.in/xmlpath.v2"
+	"github.com/marthjod/binquiry-experimental/wordtype"
+	xmlpath "gopkg.in/xmlpath.v2"
 )
 
 // GetHeader returns the raw header string from an XML snippet, if found.
