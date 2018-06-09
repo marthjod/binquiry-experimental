@@ -1,39 +1,39 @@
 package wordtype
 
 import (
-	"github.com/marthjod/bingo/model/case"
-	"github.com/marthjod/bingo/model/gender"
-	"github.com/marthjod/bingo/model/noun"
-	"github.com/marthjod/bingo/model/number"
-	"reflect"
 	"testing"
+
+	cases "github.com/marthjod/binquiry-experimental/case"
+	"github.com/marthjod/binquiry-experimental/gender"
+	"github.com/marthjod/binquiry-experimental/noun"
+	"github.com/marthjod/binquiry-experimental/number"
 )
 
 var words = &Words{
 	&noun.Noun{
-		Gender: gender.Masculine,
-		CaseForms: []noun.CaseForm{
-			{Case: cases.Nominative, Number: number.Singular, Form: "penni"},
-			{Case: cases.Accusative, Number: number.Singular, Form: "penna"},
-			{Case: cases.Dative, Number: number.Singular, Form: "penna"},
-			{Case: cases.Genitive, Number: number.Singular, Form: "penna"},
-			{Case: cases.Nominative, Number: number.Plural, Form: "pennar"},
-			{Case: cases.Accusative, Number: number.Plural, Form: "penna"},
-			{Case: cases.Dative, Number: number.Plural, Form: "pennum"},
-			{Case: cases.Genitive, Number: number.Plural, Form: "penna"},
+		Gender: gender.Gender_Masculine,
+		Cases: []*noun.CaseForm{
+			{Case: cases.Case_Nominative, Number: number.Number_Singular, Form: "penni"},
+			{Case: cases.Case_Accusative, Number: number.Number_Singular, Form: "penna"},
+			{Case: cases.Case_Dative, Number: number.Number_Singular, Form: "penna"},
+			{Case: cases.Case_Genitive, Number: number.Number_Singular, Form: "penna"},
+			{Case: cases.Case_Nominative, Number: number.Number_Plural, Form: "pennar"},
+			{Case: cases.Case_Accusative, Number: number.Number_Plural, Form: "penna"},
+			{Case: cases.Case_Dative, Number: number.Number_Plural, Form: "pennum"},
+			{Case: cases.Case_Genitive, Number: number.Number_Plural, Form: "penna"},
 		},
 	},
 	&noun.Noun{
-		Gender: gender.Feminine,
-		CaseForms: []noun.CaseForm{
-			{Case: cases.Nominative, Number: number.Singular, Form: "kona"},
-			{Case: cases.Accusative, Number: number.Singular, Form: "konu"},
-			{Case: cases.Dative, Number: number.Singular, Form: "konu"},
-			{Case: cases.Genitive, Number: number.Singular, Form: "konu"},
-			{Case: cases.Nominative, Number: number.Plural, Form: "konur"},
-			{Case: cases.Accusative, Number: number.Plural, Form: "konur"},
-			{Case: cases.Dative, Number: number.Plural, Form: "konum"},
-			{Case: cases.Genitive, Number: number.Plural, Form: "kvenna"},
+		Gender: gender.Gender_Feminine,
+		Cases: []*noun.CaseForm{
+			{Case: cases.Case_Nominative, Number: number.Number_Singular, Form: "kona"},
+			{Case: cases.Case_Accusative, Number: number.Number_Singular, Form: "konu"},
+			{Case: cases.Case_Dative, Number: number.Number_Singular, Form: "konu"},
+			{Case: cases.Case_Genitive, Number: number.Number_Singular, Form: "konu"},
+			{Case: cases.Case_Nominative, Number: number.Number_Plural, Form: "konur"},
+			{Case: cases.Case_Accusative, Number: number.Number_Plural, Form: "konur"},
+			{Case: cases.Case_Dative, Number: number.Number_Plural, Form: "konum"},
+			{Case: cases.Case_Genitive, Number: number.Number_Plural, Form: "kvenna"},
 		},
 	},
 }
@@ -66,18 +66,5 @@ func TestGetWordType(t *testing.T) {
 		if exp.out != actual {
 			t.Errorf("Expected: %v, actual: %v", exp.out, actual)
 		}
-	}
-}
-
-func TestWords_ParseTemplate(t *testing.T) {
-	expected := []byte(`penni (Masculine), 8 forms
-kona (Feminine), 8 forms`)
-
-	actual, err := words.ParseTemplate(`{{ range $i, $e := . }}{{ if $i }}{{ println }}{{ end }}{{ (index .CaseForms 0).Form }} ({{ .Gender }}), {{ .CaseForms | len }} forms{{ end }}`)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Expected: --%v--,\nactual: --%v--", string(expected), string(actual))
 	}
 }

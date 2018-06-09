@@ -10,15 +10,15 @@ var expected = []struct {
 }{
 	{
 		in:  "Hvorugkynsnafnorð",
-		out: Neuter,
+		out: Gender_Neuter,
 	},
 	{
 		in:  " Kvenkyn ",
-		out: Feminine,
+		out: Gender_Feminine,
 	},
 	{
 		in:  "Eitthvað annað",
-		out: Unknown,
+		out: Gender_Unknown,
 	},
 }
 

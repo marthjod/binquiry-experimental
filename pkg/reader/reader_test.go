@@ -2,11 +2,12 @@ package reader
 
 import (
 	"errors"
-	"github.com/marthjod/binquiry/model/wordtype"
-	"gopkg.in/xmlpath.v2"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/marthjod/binquiry-experimental/wordtype"
+	xmlpath "gopkg.in/xmlpath.v2"
 )
 
 var expectedHeader = []struct {

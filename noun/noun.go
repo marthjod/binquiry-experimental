@@ -6,7 +6,7 @@ import (
 
 	cases "github.com/marthjod/binquiry-experimental/case"
 	gender "github.com/marthjod/binquiry-experimental/gender"
-	number "github.com/marthjod/binquiry-experimental/number"
+	"github.com/marthjod/binquiry-experimental/number"
 	xmlpath "gopkg.in/xmlpath.v2"
 )
 

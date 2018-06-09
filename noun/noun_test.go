@@ -2,28 +2,29 @@ package noun
 
 import (
 	"fmt"
-	"github.com/marthjod/bingo/model/case"
-	"github.com/marthjod/bingo/model/gender"
-	"github.com/marthjod/bingo/model/number"
-	"github.com/marthjod/bingo/reader"
-	"gopkg.in/xmlpath.v2"
 	"os"
 	"reflect"
 	"testing"
+
+	cases "github.com/marthjod/binquiry-experimental/case"
+	"github.com/marthjod/binquiry-experimental/gender"
+	"github.com/marthjod/binquiry-experimental/number"
+	"github.com/marthjod/binquiry-experimental/pkg/reader"
+	xmlpath "gopkg.in/xmlpath.v2"
 )
 
 var (
 	noun = Noun{
-		Gender: gender.Masculine,
-		CaseForms: []CaseForm{
-			{Case: cases.Nominative, Number: number.Singular, Form: "penni"},
-			{Case: cases.Accusative, Number: number.Singular, Form: "penna"},
-			{Case: cases.Dative, Number: number.Singular, Form: "penna"},
-			{Case: cases.Genitive, Number: number.Singular, Form: "penna"},
-			{Case: cases.Nominative, Number: number.Plural, Form: "pennar"},
-			{Case: cases.Accusative, Number: number.Plural, Form: "penna"},
-			{Case: cases.Dative, Number: number.Plural, Form: "pennum"},
-			{Case: cases.Genitive, Number: number.Plural, Form: "penna"},
+		Gender: gender.Gender_Masculine,
+		Cases: []*CaseForm{
+			{Case: cases.Case_Nominative, Number: number.Number_Singular, Form: "penni"},
+			{Case: cases.Case_Accusative, Number: number.Number_Singular, Form: "penna"},
+			{Case: cases.Case_Dative, Number: number.Number_Singular, Form: "penna"},
+			{Case: cases.Case_Genitive, Number: number.Number_Singular, Form: "penna"},
+			{Case: cases.Case_Nominative, Number: number.Number_Plural, Form: "pennar"},
+			{Case: cases.Case_Accusative, Number: number.Number_Plural, Form: "penna"},
+			{Case: cases.Case_Dative, Number: number.Number_Plural, Form: "pennum"},
+			{Case: cases.Case_Genitive, Number: number.Number_Plural, Form: "penna"},
 		},
 	}
 )
@@ -82,36 +83,19 @@ func TestNoun_Json(t *testing.T) {
 
 }
 
-func TestNoun_List(t *testing.T) {
-	expected := []string{
-		"penni",
-		"penna",
-		"penna",
-		"penna",
-		"pennar",
-		"penna",
-		"pennum",
-		"penna",
-	}
-	actual := noun.List()
-	if !reflect.DeepEqual(expected, actual) {
-		t.Errorf("Expected: %v, actual: %v", expected, actual)
-	}
-}
-
 func ExampleNoun_JSON() {
 
 	n := Noun{
-		Gender: gender.Masculine,
-		CaseForms: []CaseForm{
-			{Case: cases.Nominative, Number: number.Singular, Form: "penni"},
-			{Case: cases.Accusative, Number: number.Singular, Form: "penna"},
-			{Case: cases.Dative, Number: number.Singular, Form: "penna"},
-			{Case: cases.Genitive, Number: number.Singular, Form: "penna"},
-			{Case: cases.Nominative, Number: number.Plural, Form: "pennar"},
-			{Case: cases.Accusative, Number: number.Plural, Form: "penna"},
-			{Case: cases.Dative, Number: number.Plural, Form: "pennum"},
-			{Case: cases.Genitive, Number: number.Plural, Form: "penna"},
+		Gender: gender.Gender_Masculine,
+		Cases: []*CaseForm{
+			{Case: cases.Case_Nominative, Number: number.Number_Singular, Form: "penni"},
+			{Case: cases.Case_Accusative, Number: number.Number_Singular, Form: "penna"},
+			{Case: cases.Case_Dative, Number: number.Number_Singular, Form: "penna"},
+			{Case: cases.Case_Genitive, Number: number.Number_Singular, Form: "penna"},
+			{Case: cases.Case_Nominative, Number: number.Number_Plural, Form: "pennar"},
+			{Case: cases.Case_Accusative, Number: number.Number_Plural, Form: "penna"},
+			{Case: cases.Case_Dative, Number: number.Number_Plural, Form: "pennum"},
+			{Case: cases.Case_Genitive, Number: number.Number_Plural, Form: "penna"},
 		},
 	}
 	fmt.Println(n.JSON())
@@ -176,17 +160,5 @@ func TestParseNoun(t *testing.T) {
 	actual := ParseNoun(header, path.Iter(root))
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("Expected: %v,\nactual: %v", expected, actual)
-	}
-}
-
-func TestNoun_ParseTemplate(t *testing.T) {
-	expected := []byte(`Masculine gender, 8 forms`)
-
-	actual, err := noun.ParseTemplate("{{.Gender}} gender, {{.CaseForms | len }} forms")
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Expected: %v,\nactual: %v", string(expected), string(actual))
 	}
 }
