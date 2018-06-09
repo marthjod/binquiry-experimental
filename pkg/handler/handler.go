@@ -73,7 +73,8 @@ func (h *backendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	resultChan := make(chan result, len(res))
 
-	for _, resp := range res {
+	for idx, resp := range res {
+		h.logger.Debugf("dispatch #%d", idx)
 		go func(r []byte) {
 			w, err := dispatch(r, h.parsers)
 			resultChan <- result{
@@ -83,7 +84,7 @@ func (h *backendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}(resp)
 	}
 
-	h.logger.Debugf("expecting %d result(s)", cap(res))
+	// h.logger.Debugf("expecting %d result(s)", cap(res))
 	for i := 0; i < cap(res); i++ {
 		select {
 		case result := <-resultChan:
@@ -94,8 +95,8 @@ func (h *backendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			h.logger.WithFields(log.Fields{
-				"result": result.word,
-			}).Debug()
+				"result": result.word.CanonicalForm(),
+			}).Debugf("received #%d", i)
 			words = append(words, result.word)
 		}
 	}
@@ -146,7 +147,7 @@ func parseNoun(in []byte, parser string) (wordtype.Word, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Debugf("response: %s", r)
+	// log.Debugf("response: %s", r)
 
 	return r.Noun, nil
 }
