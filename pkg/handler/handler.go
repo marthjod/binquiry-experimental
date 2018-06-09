@@ -18,19 +18,25 @@ import (
 	"google.golang.org/grpc"
 )
 
-type handler struct {
+// Handler represents an http.Handler (frontend) to a range of (backend) parsers.
+type Handler interface {
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
+}
+
+type backendHandler struct {
 	logger  *log.Entry
 	parsers map[wordtype.WordType]string
 }
 
-func NewBackendHandler(parsers map[wordtype.WordType]string) *handler {
-	return &handler{
+// NewBackendHandler returns a pre-configured Handler.
+func NewBackendHandler(parsers map[wordtype.WordType]string) Handler {
+	return &backendHandler{
 		logger:  &log.Entry{},
 		parsers: parsers,
 	}
 }
 
-func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *backendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	cid := generateCorrelationID()
 	h.logger = log.WithFields(log.Fields{

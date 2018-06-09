@@ -4,7 +4,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// Use timestamped format. If user-supplied log level cannot be set, exit.
+// MustSetLoglevel sets a test formatter with timestamped format. If user-supplied log level cannot be set, exit.
 func MustSetLoglevel(lvl string) {
 	var (
 		level log.Level

@@ -14,10 +14,17 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/marthjod/binquiry-experimental/pkg/reader"
 	"golang.org/x/net/html"
-	"gopkg.in/xmlpath.v2"
+	xmlpath "gopkg.in/xmlpath.v2"
 )
 
-// getter builds query URLs and HTTP requests against a data source.
+// Getter builds query URLs and HTTP requests against a data source.
+type Getter interface {
+	WordQuery(string) string
+	IDQuery(int) string
+	GetWord(string) ([][]byte, error)
+	GetID(int) (*http.Response, error)
+}
+
 type getter struct {
 	Client         *http.Client
 	URLPrefix      string
@@ -30,7 +37,8 @@ type result struct {
 	body []byte
 }
 
-func NewGetter(urlPrefix string, client *http.Client, correlationID string) *getter {
+// NewGetter returns a pre-configured Getter.
+func NewGetter(urlPrefix string, client *http.Client, correlationID string) Getter {
 	return &getter{
 		Client:    client,
 		URLPrefix: urlPrefix,
@@ -151,16 +159,14 @@ func (g *getter) dispatch(r []byte) (responses [][]byte, err error) {
 
 		for _, link := range links {
 			go g.fetchLink(link, resultChan)
-			select {
-			case result := <-resultChan:
-				if result.err != nil {
-					g.logger.WithFields(log.Fields{
-						"error": err,
-					}).Error()
-					continue
-				}
-				g.responseBodies = append(g.responseBodies, result.body)
+			result := <-resultChan
+			if result.err != nil {
+				g.logger.WithFields(log.Fields{
+					"error": err,
+				}).Error()
+				continue
 			}
+			g.responseBodies = append(g.responseBodies, result.body)
 		}
 
 		return g.responseBodies, nil
