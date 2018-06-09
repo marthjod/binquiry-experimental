@@ -84,8 +84,7 @@ func (h *backendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}(resp)
 	}
 
-	// h.logger.Debugf("expecting %d result(s)", cap(res))
-	for i := 0; i < cap(res); i++ {
+	for i := 0; i < len(res); i++ {
 		select {
 		case result := <-resultChan:
 			if result.err != nil {
