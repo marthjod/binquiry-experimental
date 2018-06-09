@@ -10,11 +10,10 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	pb "github.com/marthjod/binquiry-experimental/noun"
 	"github.com/marthjod/binquiry-experimental/pkg/getter"
-	"github.com/marthjod/binquiry-experimental/pkg/model/noun"
-	pb "github.com/marthjod/binquiry-experimental/pkg/model/noun"
-	"github.com/marthjod/binquiry-experimental/pkg/model/wordtype"
 	"github.com/marthjod/binquiry-experimental/pkg/reader"
+	"github.com/marthjod/binquiry-experimental/wordtype"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc"
 )
@@ -141,11 +140,7 @@ func parseNoun(in []byte, parser string) (wordtype.Word, error) {
 	if err != nil {
 		return nil, err
 	}
-	// log.Debugf("Response: %s", r.Json)
-	w, err := noun.FromJSON(r.Json)
-	if err != nil {
-		return nil, err
-	}
+	log.Debugf("response: %s", r)
 
-	return w, nil
+	return r.Noun, nil
 }

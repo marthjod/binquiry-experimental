@@ -7,7 +7,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/marthjod/binquiry-experimental/pkg/handler"
 	"github.com/marthjod/binquiry-experimental/pkg/logging"
-	"github.com/marthjod/binquiry-experimental/pkg/model/wordtype"
+	"github.com/marthjod/binquiry-experimental/wordtype"
 )
 
 func main() {
