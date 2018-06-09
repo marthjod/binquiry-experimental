@@ -7,9 +7,9 @@ import "case/case.proto";
 import "number/number.proto";
 
 message CaseForm {
-    string form = 1;
+    case.Case case = 1;         
     number.Number number = 2;
-    case.Case case = 3;                
+    string form = 3;           
 }
 
 message Noun {
