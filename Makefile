@@ -20,7 +20,7 @@ test:
 	STATUS=0; for PKG in $(PACKAGES); do go test -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || STATUS=1; done; exit $$STATUS
 
 .PHONY: generate
-generate: noun/noun.proto gender/gender.proto case/case.proto number/number.proto
+generate:
 	go generate ./...
 
 .PHONY: run
