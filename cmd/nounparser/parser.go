@@ -2,6 +2,7 @@
 //go:generate protoc -I ../.. --go_out=plugins=grpc:$GOPATH/src ../../gender/gender.proto
 //go:generate protoc -I ../.. --go_out=plugins=grpc:$GOPATH/src ../../number/number.proto
 //go:generate protoc -I ../.. --go_out=plugins=grpc:$GOPATH/src ../../case/case.proto
+//go:generate protoc -I ../.. --go_out=plugins=grpc:$GOPATH/src ../../wordtype/wordtype.proto
 
 package main
 

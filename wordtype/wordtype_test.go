@@ -11,19 +11,19 @@ func TestGetWordType(t *testing.T) {
 	}{
 		{
 			in:  "nafnorð",
-			out: Noun,
+			out: WordType_Noun,
 		},
 		{
 			in:  "lýsingarorð",
-			out: Adjective,
+			out: WordType_Adjective,
 		},
 		{
 			in:  "sagnorð",
-			out: Verb,
+			out: WordType_Verb,
 		},
 		{
 			in:  "Eitthvað annað",
-			out: Unknown,
+			out: WordType_Unknown,
 		},
 	}
 

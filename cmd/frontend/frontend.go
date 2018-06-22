@@ -29,7 +29,7 @@ func main() {
 	}
 
 	parsers := map[wordtype.WordType]string{
-		wordtype.Noun: nounParser,
+		wordtype.WordType_Noun: nounParser,
 	}
 	hdlr := handler.NewBackendHandler(parsers)
 

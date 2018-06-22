@@ -15,20 +15,10 @@ type Word interface {
 // Words is a list of Word types.
 type Words []Word
 
-// WordType is an enum representing word types.
-type WordType int
-
-const (
-	Noun      WordType = iota
-	Adjective WordType = iota
-	Verb      WordType = iota
-	Unknown   WordType = iota
-)
-
 var wordTypes = map[string]WordType{
-	"nafnorð":     Noun,
-	"lýsingarorð": Adjective,
-	"sagnorð":     Verb,
+	"nafnorð":     WordType_Noun,
+	"lýsingarorð": WordType_Adjective,
+	"sagnorð":     WordType_Verb,
 }
 
 // GetWordType determines a word type based on the input string.
@@ -39,7 +29,7 @@ func GetWordType(header string) WordType {
 		}
 	}
 
-	return Unknown
+	return WordType_Unknown
 }
 
 // JSON representation of Words.

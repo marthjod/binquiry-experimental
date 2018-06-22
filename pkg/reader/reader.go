@@ -21,17 +21,17 @@ func GetHeader(root *xmlpath.Node) (header string, found bool) {
 func Read(r io.Reader) (header string, wordType wordtype.WordType, xmlRoot *xmlpath.Node, err error) {
 	body, err := ioutil.ReadAll(r)
 	if err != nil {
-		return "", wordtype.Unknown, nil, err
+		return "", wordtype.WordType_Unknown, nil, err
 	}
 
 	root, err := xmlpath.Parse(bytes.NewReader(Sanitize(body)))
 	if err != nil {
-		return "", wordtype.Unknown, nil, err
+		return "", wordtype.WordType_Unknown, nil, err
 	}
 
 	header, ok := GetHeader(root)
 	if !ok {
-		return "", wordtype.Unknown, nil, errors.New("cannot find header")
+		return "", wordtype.WordType_Unknown, nil, errors.New("cannot find header")
 	}
 
 	wordType = wordtype.GetWordType(header)

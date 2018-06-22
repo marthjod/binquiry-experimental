@@ -1,0 +1,10 @@
+syntax = "proto3";
+package wordtype;
+option go_package = "github.com/marthjod/binquiry-experimental/wordtype";
+
+enum WordType {
+	Noun      = 0;
+	Adjective = 1;
+	Verb      = 2;
+	Unknown   = 3;
+}

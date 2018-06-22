@@ -112,8 +112,8 @@ func dispatch(in []byte, parsers map[wordtype.WordType]string) (wordtype.Word, e
 	}
 
 	switch wordType {
-	case wordtype.Noun:
-		return parseNoun(in, parsers[wordtype.Noun])
+	case wordtype.WordType_Noun:
+		return parseNoun(in, parsers[wordtype.WordType_Noun])
 	default:
 		return nil, errors.New("not implemented yet")
 	}
