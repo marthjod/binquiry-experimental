@@ -18,8 +18,6 @@ type Words []Word
 // WordType is an enum representing word types.
 type WordType int
 
-//go:generate jsonenums -type=WordType
-//go:generate stringer -type=WordType
 const (
 	Noun      WordType = iota
 	Adjective WordType = iota
