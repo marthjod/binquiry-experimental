@@ -30,7 +30,10 @@ run-nounparser:
 	docker run --rm --name nounparser -d -p 50051:50051 binquiry/nounparser
 
 run-frontend:
-	docker run --rm --name frontend -d -p 8000:8000 -e NOUNPARSER=localhost:50051 -e LOGLEVEL=debug binquiry/frontend
+	docker run --rm --link nounparser:nounparser --name frontend -d -p 8000:8000 -e NOUNPARSER=nounparser:50051 -e LOGLEVEL=debug binquiry/frontend
+
+stop:
+	docker container stop frontend nounparser
 
 k8s-export-%:
 	kubectl get --export -o json deployments/$* > k8s/deployment-$*.yaml
@@ -47,3 +50,6 @@ k8s-delete:
 	kubectl delete -f k8s/deployment-frontend.yaml
 	kubectl delete -f k8s/service-nounparser.yaml
 	kubectl delete -f k8s/deployment-nounparser.yaml
+
+k8s-test-%:
+	curl "http://`minikube ip`:`kubectl get services/frontend -o go-template='{{(index .spec.ports 0).nodePort}}'`/$*"
