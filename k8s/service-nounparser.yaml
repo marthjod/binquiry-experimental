@@ -1,0 +1,30 @@
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "creationTimestamp": null,
+        "labels": {
+            "k8s-app": "nounparser"
+        },
+        "name": "nounparser",
+        "selfLink": "/api/v1/namespaces/default/services/nounparser"
+    },
+    "spec": {
+        "ports": [
+            {
+                "name": "tcp-50051-50051-w7krr",
+                "port": 50051,
+                "protocol": "TCP",
+                "targetPort": 50051
+            }
+        ],
+        "selector": {
+            "k8s-app": "nounparser"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
