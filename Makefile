@@ -1,7 +1,7 @@
 PACKAGES ?= $(shell go list ./... | grep -v /vendor/ | grep -v /tests)
 
 .PHONY: all
-all: vet lint test
+all: vet lint megacheck test
 
 vet:
 	go vet $(PACKAGES)
