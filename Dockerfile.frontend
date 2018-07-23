@@ -1,0 +1,20 @@
+FROM golang as builder 
+
+WORKDIR $GOPATH/src/github.com/marthjod/binquiry-experimental
+COPY . .
+# RUN go get ./...
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -a \
+    -ldflags "-extldflags \"-static\"" \
+-o /frontend cmd/frontend/frontend.go
+
+
+FROM scratch
+
+COPY --from=builder /frontend /
+
+ENV PORT 8000
+ENV NOUNPARSER localhost:50051
+EXPOSE $PORT
+
+ENTRYPOINT [ "/frontend" ]

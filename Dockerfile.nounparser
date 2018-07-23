@@ -1,0 +1,19 @@
+FROM golang as builder 
+
+WORKDIR $GOPATH/src/github.com/marthjod/binquiry-experimental
+COPY . .
+# RUN go get ./...
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -a \
+    -ldflags "-extldflags \"-static\"" \
+-o /nounparser cmd/nounparser/nounparser.go
+
+
+FROM scratch
+
+COPY --from=builder /nounparser /
+
+ENV PORT 50051
+EXPOSE $PORT
+
+ENTRYPOINT [ "/nounparser" ]
