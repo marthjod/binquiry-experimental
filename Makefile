@@ -52,4 +52,4 @@ k8s-delete:
 	kubectl delete -f k8s/deployment-nounparser.yaml
 
 k8s-test-%:
-	curl "http://`minikube ip`:`kubectl get services/frontend -o go-template='{{(index .spec.ports 0).nodePort}}'`/$*"
+	@curl -s "http://`minikube ip`:`kubectl get services/frontend -o go-template='{{(index .spec.ports 0).nodePort}}'`/$*"
