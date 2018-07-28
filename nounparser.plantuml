@@ -1,0 +1,42 @@
+@startuml service view
+
+actor user
+participant handler
+participant getter
+database bin.arnastofnun.is
+collections nounparser
+user -> handler: /ár (HTTP)
+activate getter
+handler -> getter: /ár
+activate bin.arnastofnun.is
+getter -> bin.arnastofnun.is: ?q=ár (HTTP)
+getter <- bin.arnastofnun.is: id=1, id=2, id=3 (HTTP)
+group concurrent
+getter -> bin.arnastofnun.is: ?id=1
+getter <- bin.arnastofnun.is: <XML>
+getter -> bin.arnastofnun.is: ?id=2
+getter <- bin.arnastofnun.is: <XML>
+getter -> bin.arnastofnun.is: ?id=3
+getter <- bin.arnastofnun.is: <XML>
+end
+deactivate bin.arnastofnun.is
+deactivate getter
+group concurrent
+handler -> handler: noun?
+activate nounparser
+handler -[#green]> nounparser: <XML> (gRPC)
+handler <[#green]- nounparser: <[]struct{}> (gRPC)
+deactivate nounparser
+handler -> handler: noun?
+activate nounparser
+handler -[#green]> nounparser: <XML> (gRPC)
+handler <[#green]- nounparser: <[]struct{}> (gRPC)
+deactivate nounparser
+handler -> handler: noun?
+activate nounparser
+handler -[#green]> nounparser: <XML> (gRPC)
+handler <[#green]- nounparser: <[]struct{}> (gRPC)
+deactivate nounparser
+end
+user <- handler: <JSON> (HTTP)
+@enduml
