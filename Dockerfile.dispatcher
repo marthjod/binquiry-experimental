@@ -1,0 +1,19 @@
+FROM golang as builder 
+
+WORKDIR $GOPATH/src/github.com/marthjod/binquiry-experimental
+COPY . .
+# RUN go get ./...
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -a \
+    -ldflags "-extldflags \"-static\"" \
+-o /dispatcher cmd/dispatcher/dispatcher.go
+
+
+FROM scratch
+
+COPY --from=builder /dispatcher /
+
+ENV PORT 50051
+EXPOSE $PORT
+
+ENTRYPOINT [ "/dispatcher" ]

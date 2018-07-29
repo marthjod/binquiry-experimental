@@ -1,0 +1,30 @@
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "creationTimestamp": null,
+        "labels": {
+            "k8s-app": "dispatcher"
+        },
+        "name": "dispatcher",
+        "selfLink": "/api/v1/namespaces/default/services/dispatcher"
+    },
+    "spec": {
+        "ports": [
+            {
+                "name": "tcp-50052-50052-45zcz",
+                "port": 50052,
+                "protocol": "TCP",
+                "targetPort": 50052
+            }
+        ],
+        "selector": {
+            "k8s-app": "dispatcher"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}

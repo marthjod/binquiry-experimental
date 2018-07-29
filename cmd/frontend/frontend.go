@@ -3,6 +3,7 @@
 //go:generate protoc -I ../.. --go_out=plugins=grpc:$GOPATH/src ../../number/number.proto
 //go:generate protoc -I ../.. --go_out=plugins=grpc:$GOPATH/src ../../case/case.proto
 //go:generate protoc -I ../.. --go_out=plugins=grpc:$GOPATH/src ../../wordtype/wordtype.proto
+//go:generate protoc -I ../.. --go_out=plugins=grpc:$GOPATH/src ../../word/word.proto
 
 package main
 
@@ -13,7 +14,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/marthjod/binquiry-experimental/pkg/handler"
 	"github.com/marthjod/binquiry-experimental/pkg/logging"
-	"github.com/marthjod/binquiry-experimental/wordtype"
 )
 
 func main() {
@@ -29,15 +29,12 @@ func main() {
 		log.Fatalln("PORT not set")
 	}
 
-	nounParser := os.Getenv("NOUNPARSER")
-	if len(nounParser) == 0 {
-		log.Fatalln("NOUNPARSER not set")
+	dispatcher := os.Getenv("DISPATCHER")
+	if len(dispatcher) == 0 {
+		log.Fatalln("DISPATCHER not set")
 	}
 
-	parsers := map[wordtype.WordType]string{
-		wordtype.WordType_Noun: nounParser,
-	}
-	hdlr := handler.NewBackendHandler(parsers)
+	hdlr := handler.NewBackendHandler(dispatcher)
 
 	log.Infof("listening on :%s", port)
 	log.Fatalln(http.ListenAndServe(":"+port, hdlr))

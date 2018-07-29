@@ -8,10 +8,10 @@
         "creationTimestamp": null,
         "generation": 1,
         "labels": {
-            "k8s-app": "frontend"
+            "k8s-app": "dispatcher"
         },
-        "name": "frontend",
-        "selfLink": "/apis/extensions/v1beta1/namespaces/default/deployments/frontend"
+        "name": "dispatcher",
+        "selfLink": "/apis/extensions/v1beta1/namespaces/default/deployments/dispatcher"
     },
     "spec": {
         "progressDeadlineSeconds": 600,
@@ -19,7 +19,7 @@
         "revisionHistoryLimit": 10,
         "selector": {
             "matchLabels": {
-                "k8s-app": "frontend"
+                "k8s-app": "dispatcher"
             }
         },
         "strategy": {
@@ -33,26 +33,22 @@
             "metadata": {
                 "creationTimestamp": null,
                 "labels": {
-                    "k8s-app": "frontend"
+                    "k8s-app": "dispatcher"
                 },
-                "name": "frontend"
+                "name": "dispatcher"
             },
             "spec": {
                 "containers": [
                     {
                         "env": [
                             {
-                                "name": "LOGLEVEL",
-                                "value": "debug"
-                            },
-                            {
-                                "name": "DISPATCHER",
-                                "value": "dispatcher:50052"
+                                "name": "NOUNPARSER",
+                                "value": "nounparser:50051"
                             }
                         ],
-                        "image": "localhost:5000/binquiry/frontend",
+                        "image": "localhost:5000/binquiry/dispatcher",
                         "imagePullPolicy": "Always",
-                        "name": "frontend",
+                        "name": "dispatcher",
                         "resources": {},
                         "securityContext": {
                             "privileged": false

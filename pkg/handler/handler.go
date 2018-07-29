@@ -1,21 +1,20 @@
 package handler
 
 import (
-	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
-	pb "github.com/marthjod/binquiry-experimental/noun"
-	"github.com/marthjod/binquiry-experimental/pkg/getter"
-	"github.com/marthjod/binquiry-experimental/pkg/reader"
-	"github.com/marthjod/binquiry-experimental/wordtype"
-	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc"
+
+	log "github.com/Sirupsen/logrus"
+	"github.com/marthjod/binquiry-experimental/pkg/getter"
+	"github.com/marthjod/binquiry-experimental/word"
+	pb "github.com/marthjod/binquiry-experimental/word"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 // Handler represents an http.Handler (frontend) to a range of (backend) parsers.
@@ -24,15 +23,15 @@ type Handler interface {
 }
 
 type backendHandler struct {
-	logger  *log.Entry
-	parsers map[wordtype.WordType]string
+	logger            *log.Entry
+	dispatcherAddress string
 }
 
 // NewBackendHandler returns a pre-configured Handler.
-func NewBackendHandler(parsers map[wordtype.WordType]string) Handler {
+func NewBackendHandler(dispatcherAddress string) Handler {
 	return &backendHandler{
-		logger:  &log.Entry{},
-		parsers: parsers,
+		logger:            &log.Entry{},
+		dispatcherAddress: dispatcherAddress,
 	}
 }
 
@@ -66,9 +65,9 @@ func (h *backendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var words = wordtype.Words{}
+	var words = word.Words{}
 	type result struct {
-		word wordtype.Word
+		word *word.Word
 		err  error
 	}
 	resultChan := make(chan result, len(res))
@@ -76,7 +75,7 @@ func (h *backendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for idx, resp := range res {
 		h.logger.Debugf("dispatch #%d", idx)
 		go func(r []byte) {
-			w, err := dispatch(r, h.parsers)
+			w, err := h.dispatch(r)
 			resultChan <- result{
 				word: w,
 				err:  err,
@@ -105,18 +104,30 @@ func (h *backendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.logger.WithField("duration", end.Sub(start)).Debug("done")
 }
 
-func dispatch(in []byte, parsers map[wordtype.WordType]string) (wordtype.Word, error) {
-	_, wordType, _, err := reader.Read(bytes.NewReader(in))
+func (h *backendHandler) dispatch(in []byte) (*word.Word, error) {
+	conn, err := grpc.Dial(h.dispatcherAddress, grpc.WithInsecure())
 	if err != nil {
-		return nil, err
+		h.logger.WithFields(log.Fields{
+			"error": err,
+		}).Error("did not connect")
+		return &word.Word{}, err
 	}
+	defer conn.Close()
+	c := pb.NewDispatcherClient(conn)
 
-	switch wordType {
-	case wordtype.WordType_Noun:
-		return parseNoun(in, parsers[wordtype.WordType_Noun])
-	default:
-		return nil, errors.New("not implemented yet")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	r, err := c.Dispatch(ctx, &pb.DispatchRequest{Word: in})
+	if err != nil {
+		h.logger.WithFields(log.Fields{
+			"error": err,
+		}).Error("could not dispatch")
+		return &word.Word{}, err
 	}
+	h.logger.WithFields(log.Fields{
+		"response": r.Word.CanonicalForm(),
+	}).Debug()
+	return r.Word, nil
 }
 
 func generateCorrelationID() string {
@@ -127,26 +138,4 @@ func generateCorrelationID() string {
 		return "no-uuid"
 	}
 	return uuid.String()
-}
-
-func parseNoun(in []byte, parser string) (wordtype.Word, error) {
-
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(parser, grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-	c := pb.NewNounParserClient(conn)
-
-	// Contact the server and print out its response.
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	r, err := c.Parse(ctx, &pb.ParseRequest{Word: in})
-	if err != nil {
-		return nil, err
-	}
-	// log.Debugf("response: %s", r)
-
-	return r.Noun, nil
 }

@@ -29,8 +29,11 @@ push-%:
 run-nounparser:
 	docker run --rm --name nounparser -d -p 50051:50051 binquiry/nounparser
 
+run-dispatcher:
+	docker run --rm --name dispatcher --link nounparser:nounparser -d -p 50052:50052 -e NOUNPARSER=nounparser:50051 binquiry/dispatcher
+
 run-frontend:
-	docker run --rm --link nounparser:nounparser --name frontend -d -p 8000:8000 -e NOUNPARSER=nounparser:50051 -e LOGLEVEL=debug binquiry/frontend
+	docker run --rm --name frontend --link dispatcher:dispatcher -d -p 8000:8000 -e DISPATCHER=dispatcher:50052 -e LOGLEVEL=debug binquiry/frontend
 
 stop:
 	docker container stop frontend nounparser
@@ -40,16 +43,16 @@ k8s-export-%:
 	kubectl get --export -o json services/$* > k8s/service-$*.yaml
 
 k8s-create:
-	kubectl create -f k8s/deployment-nounparser.yaml
-	kubectl create -f k8s/service-nounparser.yaml
-	kubectl create -f k8s/deployment-frontend.yaml
-	kubectl create -f k8s/service-frontend.yaml
+	for s in nounparser dispatcher frontend; do
+		kubectl create -f k8s/deployment-${s}.yaml
+		kubectl create -f k8s/service-${s}.yaml
+	done
 
 k8s-delete:
-	kubectl delete -f k8s/service-frontend.yaml
-	kubectl delete -f k8s/deployment-frontend.yaml
-	kubectl delete -f k8s/service-nounparser.yaml
-	kubectl delete -f k8s/deployment-nounparser.yaml
+	for s in nounparser dispatcher frontend; do
+		kubectl delete -f k8s/service-${s}.yaml
+		kubectl delete -f k8s/deployment-${s}.yaml		
+	done
 
 k8s-test-%:
 	@curl -s "http://`minikube ip`:`kubectl get services/frontend -o go-template='{{(index .spec.ports 0).nodePort}}'`/$*"

@@ -1,0 +1,23 @@
+syntax = "proto3";
+package wordtype;
+option go_package = "github.com/marthjod/binquiry-experimental/word";
+
+import "wordtype/wordtype.proto";
+import "noun/noun.proto";
+
+message Word {
+    wordtype.WordType type = 1;
+    noun.Noun noun = 2;
+}
+
+message DispatchRequest {
+    bytes word = 1;
+}
+
+message DispatchResponse {
+	Word word = 1;
+}
+
+service Dispatcher {
+    rpc Dispatch (DispatchRequest) returns (DispatchResponse) {}
+}

@@ -44,16 +44,16 @@ func (x WordType) String() string {
 	return proto.EnumName(WordType_name, int32(x))
 }
 func (WordType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_wordtype_2ec6d2cb36a47b26, []int{0}
+	return fileDescriptor_wordtype_ec80b72a2d58c786, []int{0}
 }
 
 func init() {
 	proto.RegisterEnum("wordtype.WordType", WordType_name, WordType_value)
 }
 
-func init() { proto.RegisterFile("wordtype/wordtype.proto", fileDescriptor_wordtype_2ec6d2cb36a47b26) }
+func init() { proto.RegisterFile("wordtype/wordtype.proto", fileDescriptor_wordtype_ec80b72a2d58c786) }
 
-var fileDescriptor_wordtype_2ec6d2cb36a47b26 = []byte{
+var fileDescriptor_wordtype_ec80b72a2d58c786 = []byte{
 	// 157 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2f, 0xcf, 0x2f, 0x4a,
 	0x29, 0xa9, 0x2c, 0x48, 0xd5, 0x87, 0x31, 0xf4, 0x0a, 0x8a, 0xf2, 0x4b, 0xf2, 0x85, 0x38, 0x60,

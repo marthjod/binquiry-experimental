@@ -3,6 +3,7 @@
 actor user
 participant handler
 participant getter
+participant dispatcher
 database bin.arnastofnun.is
 collections nounparser
 user -> handler: /ár (HTTP)
@@ -20,12 +21,13 @@ getter -> bin.arnastofnun.is: ?id=3
 getter <- bin.arnastofnun.is: <XML>
 end
 deactivate bin.arnastofnun.is
+handler <- getter: <XML> [, <XML>]
 deactivate getter
 group concurrent
-handler -> handler: noun?
+handler -> dispatcher: <XML>
 activate nounparser
-handler -[#green]> nounparser: <XML> (gRPC)
-handler <[#green]- nounparser: <[]struct{}> (gRPC)
+dispatcher -[#green]> nounparser: <XML> (gRPC)
+dispatcher <[#green]- nounparser: <[]struct{}> (gRPC)
 deactivate nounparser
 handler -> handler: noun?
 activate nounparser
